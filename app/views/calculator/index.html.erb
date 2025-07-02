@@ -1,0 +1,25 @@
+<h1>Simple Calculator</h1>
+<p style="color: red;">🔍 View loaded at: <%= Time.now %></p>
+
+<%= form_with url: root_path, method: :post, local: true, data: { turbo: false } do %>
+  <p>
+    <%= label_tag :num1, "First Number:" %>
+    <%= number_field_tag :num1, params[:num1] %>
+  </p>
+
+  <p>
+    <%= label_tag :operation, "Operation:" %>
+    <%= select_tag :operation, options_for_select([['Add', '+'], ['Subtract', '-'], ['Multiply', '*'], ['Divide', '/']], params[:operation]) %>
+  </p>
+
+  <p>
+    <%= label_tag :num2, "Second Number:" %>
+    <%= number_field_tag :num2, params[:num2] %>
+  </p>
+
+  <%= submit_tag "Calculate" %>
+<% end %>
+
+<% if instance_variable_defined?(:@result) %>
+  <h2 style="color: green;">✅ The result is: <%= @result.inspect %></h2>
+<% end %>
