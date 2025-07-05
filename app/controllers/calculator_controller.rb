@@ -1,24 +1,23 @@
 class CalculatorController < ApplicationController
   def index
     if request.post?
-      num1 = params[:num1].to_f
-      num2 = params[:num2].to_f
-      operation = params[:operation]
+      expression = params[:expression]
 
-      @result = case operation
-                when '+'
-                  num1 + num2
-                when '-'
-                  num1 - num2
-                when '*'
-                  num1 * num2
-                when '/'
-                  num2 != 0 ? num1 / num2 : 'Error: Division by zero'
-                else
-                  'Invalid operation'
-                end
-      Rails.logger.debug "Params received: #{params.inspect}"
-      Rails.logger.debug "Calculated result: #{@result.inspect}"
+      if expression.gsub(/[0-9+\/*%().\s^,-]/, '').empty?
+        begin
+          safe_expr = expression.gsub('^', '**')
+          @result = eval(safe_expr)
+          @result = @result.round(4) if @result.is_a?(Float)
+        rescue ZeroDivisionError
+          @result = "Error: Division by zero"
+        rescue => e
+          @result = "Error: #{e.message}"
+        end
+      else
+        @result = "Invalid characters in input."
+      end
     end
   end
 end
+
+

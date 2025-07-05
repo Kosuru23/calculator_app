@@ -1,25 +1,44 @@
-<h1>Simple Calculator</h1>
-<p style="color: red;">🔍 View loaded at: <%= Time.now %></p>
+<h1>Calculator</h1>
 
-<%= form_with url: root_path, method: :post, local: true, data: { turbo: false } do %>
-  <p>
-    <%= label_tag :num1, "First Number:" %>
-    <%= number_field_tag :num1, params[:num1] %>
-  </p>
+<%= form_with url: root_path, method: :post, local: true, data: { turbo: false }, id: "calc-form" do %>
+  <%= text_field_tag :expression, params[:expression], id: "expression", size: 30, autocomplete: "off" %><br><br>
 
-  <p>
-    <%= label_tag :operation, "Operation:" %>
-    <%= select_tag :operation, options_for_select([['Add', '+'], ['Subtract', '-'], ['Multiply', '*'], ['Divide', '/']], params[:operation]) %>
-  </p>
-
-  <p>
-    <%= label_tag :num2, "Second Number:" %>
-    <%= number_field_tag :num2, params[:num2] %>
-  </p>
-
-  <%= submit_tag "Calculate" %>
+  <div id="calculator-buttons" style="display: grid; grid-template-columns: repeat(4, 60px); gap: 10px;">
+    <% ["7", "8", "9", "+",
+        "4", "5", "6", "-",
+        "1", "2", "3", "*",
+        "0", ".", "(", "/",
+        ")", "^", "%", "C",
+        "="].each do |btn| %>
+      <button type="button" onclick="handleClick('<%= btn %>')"><%= btn %></button>
+    <% end %>
+  </div>
 <% end %>
 
-<% if instance_variable_defined?(:@result) %>
-  <h2 style="color: green;">✅ The result is: <%= @result.inspect %></h2>
+<% if defined?(@result) %>
+  <h2>Result: <%= @result %></h2>
 <% end %>
+
+<script>
+  const input = document.getElementById("expression");
+  const form = document.getElementById("calc-form");
+
+  function handleClick(value) {
+    if (value === "=") {
+      form.submit();
+    } else if (value === "C") {
+      input.value = "";
+    } else {
+      input.value += value;
+      input.focus(); // Keep focus so keyboard input still works
+    }
+  }
+
+  // 🧠 Listen for Enter key to submit
+  input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      form.submit();
+    }
+  });
+</script>
