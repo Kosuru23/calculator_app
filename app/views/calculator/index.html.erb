@@ -3,15 +3,33 @@
 <%= form_with url: root_path, method: :post, local: true, data: { turbo: false }, id: "calc-form" do %>
   <%= text_field_tag :expression, params[:expression], id: "expression", size: 30, autocomplete: "off" %><br><br>
 
-  <div id="calculator-buttons" style="display: grid; grid-template-columns: repeat(4, 60px); gap: 10px;">
-    <% ["7", "8", "9", "+",
-        "4", "5", "6", "-",
-        "1", "2", "3", "*",
-        "0", ".", "(", "/",
-        ")", "^", "%", "C",
-        "="].each do |btn| %>
-      <button type="button" onclick="handleClick('<%= btn %>')"><%= btn %></button>
-    <% end %>
+<div id="calculator-buttons" style="display: grid; grid-template-columns: repeat(4, 60px); gap: 10px;">
+    <button type="button" onclick="handleClick('7')">7</button>
+    <button type="button" onclick="handleClick('8')">8</button>
+    <button type="button" onclick="handleClick('9')">9</button>
+    <button type="button" onclick="handleClick('+')">+</button>
+
+    <button type="button" onclick="handleClick('4')">4</button>
+    <button type="button" onclick="handleClick('5')">5</button>
+    <button type="button" onclick="handleClick('6')">6</button>
+    <button type="button" onclick="handleClick('-')">-</button>
+
+    <button type="button" onclick="handleClick('1')">1</button>
+    <button type="button" onclick="handleClick('2')">2</button>
+    <button type="button" onclick="handleClick('3')">3</button>
+    <button type="button" onclick="handleClick('*')">*</button>
+
+    <button type="button" onclick="handleClick('0')">0</button>
+    <button type="button" onclick="handleClick('.')">.</button>
+    <button type="button" onclick="handleClick('(')">(</button>
+    <button type="button" onclick="handleClick('/')">/</button>
+
+    <button type="button" onclick="handleClick(')')">)</button>
+    <button type="button" onclick="handleClick('^')">^</button>
+    <button type="button" onclick="handleClick('%')">%</button>
+    <button type="button" onclick="handleClick('C')">C</button>
+
+    <button type="button" onclick="handleClick('=')">=</button>
   </div>
 <% end %>
 
@@ -30,11 +48,10 @@
       input.value = "";
     } else {
       input.value += value;
-      input.focus(); // Keep focus so keyboard input still works
+      input.focus();
     }
   }
 
-  // 🧠 Listen for Enter key to submit
   input.addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
       e.preventDefault();
