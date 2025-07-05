@@ -35,7 +35,9 @@
 
 <% if defined?(@result) %>
   <h2>Result: <%= @result %></h2>
-<% end %>
+<% end %> <br>
+
+<div> <%= link_to "Statistic Page", stats_path %> </div>
 
 <script>
   const input = document.getElementById("expression");

@@ -40,7 +40,7 @@ class CalculatorController < ApplicationController
     end
   end
 
-    def preprocess_expression(expr)
+  def preprocess_expression(expr)
     expr = expr.gsub('^', '**')
 
     expr = expr.gsub(/%(\s*\d)/, '% of\1')
@@ -56,6 +56,11 @@ class CalculatorController < ApplicationController
     end
 
     expr
+  end
+
+  def stats
+    @message = "Welcome to the Stats Page!"
+    render :index
   end
 end
 
