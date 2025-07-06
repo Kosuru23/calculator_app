@@ -3,14 +3,37 @@
 <%= form_with url: stats_path, method: :post, local: true, data: { turbo: false } do %>
   <label>Enter numbers (comma-separated):</label><br>
   <%= text_field_tag :numbers, params[:numbers], size: 50 %><br><br>
+
+  <label>Enter weights (comma-separated, same count as numbers):</label><br>
+  <%= text_field_tag :weights, params[:weights], size: 50 %><br><br>
+
+  <%= check_box_tag :use_weighted_mean, "1", use_weighted = params[:use_weighted_mean].present? && params[:weights].present? %>
+  <label for="use_weighted_mean">Use Weighted Mean</label><br><br>
+
   <%= submit_tag "Calculate Stats" %>
 <% end %>
 
 <% if @mean %>
-  <h2>Results:</h2> 
-  <p><strong>Mean:</strong> <%= @mean.round(2) %></p>
+  <h2>Results:</h2>
+  <p><strong>Minimum:</strong> <%= @min %></p>
+  <p><strong>Maximum:</strong> <%= @max %></p>
+  <p><strong>Mean (Unweighted):</strong> <%= @mean.round(4) %></p>
+
+  <% if @weighted_mean %>
+    <p><strong>Weighted Mean:</strong> <%= @weighted_mean.round(4) %></p>
+  <% end %>
+
   <p><strong>Median:</strong> <%= @median %></p>
   <p><strong>Mode:</strong> <%= @mode ? @mode.join(', ') : 'No mode' %></p>
+  <hr>
+  <p><strong>Population Variance:</strong> <%= @pop_variance.round(4) %></p>
+  <p><strong>Population Standard Deviation:</strong> <%= @pop_std_dev.round(4) %></p>
+  <p><strong>Sample Variance:</strong> <%= @sample_variance.round(4) %></p>
+  <p><strong>Sample Standard Deviation:</strong> <%= @sample_std_dev.round(4) %></p>
+  <hr>
+  <p><strong>MAD (Mean Absolute Deviation):</strong> <%= @mad.round(4) %></p>
+  <p><strong>RMS (Root Mean Square):</strong> <%= @rms.round(4) %></p>
+  <p><strong>IQR (Interquartile Range):</strong> <%= @iqr.round(4) %></p>
 <% elsif @error %>
   <p style="color: red;"><%= @error %></p>
 <% end %>

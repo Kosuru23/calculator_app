@@ -1,3 +1,6 @@
+require 'bigdecimal'
+require 'bigdecimal/util'
+
 class CalculatorController < ApplicationController
   def index
     if request.post?
@@ -26,24 +29,78 @@ class CalculatorController < ApplicationController
   end
 
   def calculate_stats
-    input = params[:numbers].to_s.strip.gsub(/\s+/, '')
-    numbers = input.split(',').map(&:to_f)
+    numbers = params[:numbers].to_s.strip.gsub(/[\s\r\n]+/, '').split(',').map(&:strip).map(&:to_d)
+    weights = params[:weights].to_s.strip.gsub(/[\s\r\n]+/, '').split(',').map(&:strip).map(&:to_d)
+    use_weighted = params[:use_weighted_mean].present?
 
-    if numbers.empty? || numbers.all?(&:zero?)
-      @error = "Invalid input. Please enter a list of numbers."
+    if numbers.empty? || numbers.size < 2
+      @error = "Please enter at least two numbers."
       return render :stats
     end
 
-    @mean = numbers.sum / numbers.size rescue numbers.inject(0, :+) / numbers.size.to_f
+    if use_weighted
+      if weights.size != numbers.size
+        @error = "Weights count must match numbers count."
+        return render :stats
+      end
 
+      @weighted_components = numbers.each_with_index.map do |n, i|
+        {
+          index: i,
+          number: n,
+          weight: weights[i],
+          product: n * weights[i]  # both are BigDecimal
+        }
+      end
+
+      @weighted_sum = @weighted_components.sum { |h| h[:product] }
+      @weight_total = weights.sum
+      @weighted_mean = @weighted_sum / @weight_total unless @weight_total.zero?
+
+    end
+
+    # Unweighted Mean (always calculate this for basic stats)
+    @mean = numbers.sum.to_f / numbers.size
+
+    # Step 3: Basic stats
     sorted = numbers.sort
-    len = sorted.size
+    len = numbers.size
+
+    # Median
     @median = len.odd? ? sorted[len / 2] : (sorted[len / 2 - 1] + sorted[len / 2]) / 2.0
 
+    # Mode
     freq = numbers.tally
     max_freq = freq.values.max
     @mode = freq.select { |_, v| v == max_freq }.keys
     @mode = nil if @mode.size == numbers.uniq.size
+
+    # Min & Max
+    @min = numbers.min
+    @max = numbers.max
+
+    # Variance and Std Dev (unweighted)
+    squared_diffs = numbers.map { |n| (n - @mean)**2 }
+    @pop_variance = squared_diffs.sum / numbers.size
+    @pop_std_dev = Math.sqrt(@pop_variance)
+
+    @sample_variance = squared_diffs.sum / (numbers.size - 1)
+    @sample_std_dev = Math.sqrt(@sample_variance)
+
+    # MAD
+    absolute_diffs = numbers.map { |n| (n - @mean).abs }
+    @mad = absolute_diffs.sum / numbers.size
+
+    # RMS
+    squared = numbers.map { |n| n**2 }
+    @rms = Math.sqrt(squared.sum / numbers.size)
+
+    # IQR
+    q1_index = (len * 0.25).floor
+    q3_index = (len * 0.75).floor
+    q1 = sorted[q1_index]
+    q3 = sorted[q3_index]
+    @iqr = q3 - q1
 
     render :stats
   end
