@@ -1,5 +1,6 @@
 require 'bigdecimal'
 require 'bigdecimal/util'
+require 'matrix'
 
 class CalculatorController < ApplicationController
   def index
@@ -132,6 +133,20 @@ class CalculatorController < ApplicationController
     rescue => e
       @expression = "Error: #{e.message}"
     end
+  end
+
+  def linear
+  end
+
+  def calculate_linear
+    if params[:equation].present?
+      equations = params[:equation]
+      solve_single_variable(equations)
+    else
+      solve_2x2()
+    end
+
+    render :linear
   end
 
   private
@@ -340,5 +355,52 @@ class CalculatorController < ApplicationController
     new_vars
   end
 
+  # Linear Equations
+  def solve_2x2
+    begin
+      a1 = params[:a1].to_f
+      b1 = params[:b1].to_f
+      c1 = params[:c1].to_f
+      a2 = params[:a2].to_f
+      b2 = params[:b2].to_f
+      c2 = params[:c2].to_f
+
+      a = Matrix[[a1, b1], [a2, b2]]
+      b = Matrix[[c1], [c2]]
+
+      result = a.inverse * b
+      @x = result[0, 0]
+      @y = result[1, 0]
+    rescue => e
+      @error = "2x2 Solver Error: #{e.message}"
+    end
+  end
+
+  def solve_single_variable(equation)
+    equation = params[:equation]
+      begin
+      # Replace `y` with `x` for evaluation
+      expr = equation.gsub('y', 'x')
+      left, right = expr.split('=')
+      raise 'Invalid equation' unless left && right
+
+      # We'll find a value for x that satisfies the equation: left == right
+      solution = nil
+      (-1000..1000).step(0.01).each do |x|
+        lhs = eval(left)
+        rhs = eval(right)
+        if (lhs - rhs).abs < 0.0001
+          solution = x.round(4)
+          break
+        end
+      end
+
+      raise "No solution found (or too complex)" unless solution
+
+      @single_solution = "y = #{solution}"
+      rescue => e
+      @error = "Single Variable Error: #{e.message}"
+      end
+  end
 
 end

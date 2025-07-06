@@ -1,0 +1,43 @@
+<h1>Linear Equation Solver</h1>
+
+<h2>🔷 Solve 2x2 Linear System</h2>
+
+<%= form_with url: linear_path, method: :post, local: true, data: { turbo: false } do %>
+  <h3>Equation 1: a₁x + b₁y = c₁</h3>
+  <%= number_field_tag :a1, params[:a1], placeholder: "a₁" %>
+  <%= number_field_tag :b1, params[:b1], placeholder: "b₁" %>
+  =
+  <%= number_field_tag :c1, params[:c1], placeholder: "c₁" %><br><br>
+
+  <h3>Equation 2: a₂x + b₂y = c₂</h3>
+  <%= number_field_tag :a2, params[:a2], placeholder: "a₂" %>
+  <%= number_field_tag :b2, params[:b2], placeholder: "b₂" %>
+  =
+  <%= number_field_tag :c2, params[:c2], placeholder: "c₂" %><br><br>
+
+  <%= submit_tag "Solve 2x2" %>
+<% end %>
+
+<% if @x && @y %>
+  <h3>🧮 Solution for 2x2:</h3>
+  <p>x = <%= @x %></p>
+  <p>y = <%= @y %></p>
+<% end %>
+
+<hr>
+
+<h2>🔷 Solve 1-Variable Equation (e.g. y – 3 = 2y + 1)</h2>
+
+<%= form_with url: linear_path, method: :post, local: true do %>
+  <%= text_field_tag :equation, params[:equation], size: 50, placeholder: "Enter equation like (y-3)/4 + ... = 1" %><br><br>
+  <%= submit_tag "Solve 1-Variable" %>
+<% end %>
+
+<% if @single_solution %>
+  <h3>🧮 Solution:</h3>
+  <p><%= @single_solution %></p>
+<% end %>
+
+<% if @error %>
+  <p style="color:red;"><%= @error %></p>
+<% end %>

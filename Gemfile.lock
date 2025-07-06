@@ -102,6 +102,9 @@ GEM
     debug (1.11.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    dentaku (3.5.4)
+      bigdecimal
+      concurrent-ruby
     dotenv (3.1.8)
     drb (2.2.3)
     ed25519 (1.4.0)
@@ -347,6 +350,7 @@ DEPENDENCIES
   brakeman
   capybara
   debug
+  dentaku
   importmap-rails
   jbuilder
   kamal
