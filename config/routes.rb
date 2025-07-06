@@ -3,4 +3,6 @@ Rails.application.routes.draw do
   post '/', to: 'calculator#index'
 
   get "stats", to: "calculator#stats"
+  post 'stats', to: 'calculator#calculate_stats'
+  get "polynomial", to: "calculator#polynomial"
 end

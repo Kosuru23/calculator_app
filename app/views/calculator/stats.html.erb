@@ -1,4 +1,19 @@
-<h1>Statistics Page</h1>
-<p>This is a completely separate page from the calculator.</p>
+<h1>Statistics Calculator</h1>
 
-<div> <%= link_to "Go to Calculator", root_path %> </div>
+<%= form_with url: stats_path, method: :post, local: true, data: { turbo: false } do %>
+  <label>Enter numbers (comma-separated):</label><br>
+  <%= text_field_tag :numbers, params[:numbers], size: 50 %><br><br>
+  <%= submit_tag "Calculate Stats" %>
+<% end %>
+
+<% if @mean %>
+  <h2>Results:</h2> 
+  <p><strong>Mean:</strong> <%= @mean.round(2) %></p>
+  <p><strong>Median:</strong> <%= @median %></p>
+  <p><strong>Mode:</strong> <%= @mode ? @mode.join(', ') : 'No mode' %></p>
+<% elsif @error %>
+  <p style="color: red;"><%= @error %></p>
+<% end %>
+
+<div> <%= link_to "Calculator", root_path, data: { turbo: false } %> </div>
+<div> <%= link_to "Polynomials Page", polynomial_path, data: { turbo: false } %> </div>

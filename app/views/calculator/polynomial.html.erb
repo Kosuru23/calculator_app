@@ -1,0 +1,16 @@
+<h2>Polynomial Tool</h2>
+
+<%= form_with url: '/polynomial', method: :get, local: true do %>
+  Enter any polynomial expression:<br>
+  <%= text_field_tag :expression, params[:expression], size: 50 %><br><br>
+  <%= submit_tag "Simplify / Expand / Multiply / Divide" %>
+<% end %>
+
+<% if @expression.present? %>
+  <p><strong>Result:</strong> <%= @expression %></p>
+<% elsif @message.present? %>
+  <p><%= @message %></p>
+<% end %>
+
+<div> <%= link_to "Go to Calculator", root_path, data: { turbo: false } %> </div>
+<div> <%= link_to "Statistic Page", stats_path, data: { turbo: false } %> </div>

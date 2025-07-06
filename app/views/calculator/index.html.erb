@@ -37,27 +37,33 @@
   <h2>Result: <%= @result %></h2>
 <% end %> <br>
 
-<div> <%= link_to "Statistic Page", stats_path %> </div>
+<%= link_to "Polynomials Page", polynomial_path, data: { turbo: false } %> <br>
+<%= link_to "Statistic Page", stats_path, data: { turbo: false } %>
 
 <script>
-  const input = document.getElementById("expression");
-  const form = document.getElementById("calc-form");
+  document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("expression");
+    const form = document.getElementById("calc-form");
 
-  function handleClick(value) {
-    if (value === "=") {
-      form.submit();
-    } else if (value === "C") {
-      input.value = "";
-    } else {
-      input.value += value;
-      input.focus();
+    function handleClick(value) {
+      if (value === "=") {
+        form.submit();
+      } else if (value === "C") {
+        input.value = "";
+      } else {
+        input.value += value;
+        input.focus();
+      }
     }
-  }
 
-  input.addEventListener("keydown", function(e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      form.submit();
-    }
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        form.submit();
+      }
+    });
+
+    // Expose handleClick to global scope
+    window.handleClick = handleClick;
   });
 </script>
