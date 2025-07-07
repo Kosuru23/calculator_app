@@ -7,4 +7,5 @@ Rails.application.routes.draw do
   get "polynomial", to: "calculator#polynomial"
   get "linear", to: "calculator#linear"
   post 'linear', to: 'calculator#calculate_linear'
+  get 'quadratic', to: 'calculator#calculate_quadratic'
 end

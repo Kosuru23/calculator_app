@@ -149,6 +149,9 @@ class CalculatorController < ApplicationController
     render :linear
   end
 
+  def quadratic
+  end
+
   private
   # Calculator
   def format_number_with_spaces(number)
@@ -377,14 +380,28 @@ class CalculatorController < ApplicationController
   end
 
   def solve_single_variable(equation)
-    equation = params[:equation]
-      begin
-      # Replace `y` with `x` for evaluation
+    begin
+      # Normalize unicode dashes to ASCII minus
+      equation = equation.gsub(/[–—−]/, '-')
+
+      # Replace 'y' with 'x'
       expr = equation.gsub('y', 'x')
+
+      # Insert * between number and variable (e.g. 2x → 2*x)
+      expr = expr.gsub(/(\d)([a-zA-Z])/, '\1*\2')
+
+      # Insert * between variable and variable (e.g. xz → x*z) — optional
+      expr = expr.gsub(/([a-zA-Z])([a-zA-Z])/, '\1*\2')
+
+      # Insert * between number/variable and open parenthesis
+      expr = expr.gsub(/(\d|\w)\(/, '\1*(')
+
+      # Insert * between closing parenthesis and variable/number
+      expr = expr.gsub(/\)(\d|\w)/, ')*\1')
+
       left, right = expr.split('=')
       raise 'Invalid equation' unless left && right
 
-      # We'll find a value for x that satisfies the equation: left == right
       solution = nil
       (-1000..1000).step(0.01).each do |x|
         lhs = eval(left)
@@ -398,9 +415,10 @@ class CalculatorController < ApplicationController
       raise "No solution found (or too complex)" unless solution
 
       @single_solution = "y = #{solution}"
-      rescue => e
+    rescue => e
       @error = "Single Variable Error: #{e.message}"
-      end
+    end
   end
+
 
 end

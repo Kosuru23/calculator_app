@@ -28,10 +28,12 @@
 
 <h2>🔷 Solve 1-Variable Equation (e.g. y – 3 = 2y + 1)</h2>
 
-<%= form_with url: linear_path, method: :post, local: true do %>
+<%= form_with url: linear_path, method: :post, local: true, data: { turbo: false } do %>
+  <%= hidden_field_tag :type, "single" %>
   <%= text_field_tag :equation, params[:equation], size: 50, placeholder: "Enter equation like (y-3)/4 + ... = 1" %><br><br>
   <%= submit_tag "Solve 1-Variable" %>
 <% end %>
+
 
 <% if @single_solution %>
   <h3>🧮 Solution:</h3>
@@ -41,3 +43,7 @@
 <% if @error %>
   <p style="color:red;"><%= @error %></p>
 <% end %>
+
+<%= link_to "Polynomials Page", polynomial_path, data: { turbo: false } %> <br>
+<%= link_to "Statistic Page", stats_path, data: { turbo: false } %> <br>
+<%= link_to "Quadratic Page", quadratic_path, data: { turbo: false } %> <br>
