@@ -4,7 +4,7 @@ require "rails"
 require "action_controller/railtie"
 require "action_view/railtie"
 require "sprockets/railtie" 
-require "action_mailer/railtie"
+# require "action_mailer/railtie"
 
 # Skip active_record/railtie since we don't use a database
 
