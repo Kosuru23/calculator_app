@@ -10,12 +10,6 @@ Rails.application.configure do
   config.action_dispatch.show_exceptions = :rescuable
   config.action_controller.allow_forgery_protection = false
 
-  # Disable ActiveStorage (we're not using uploads)
-  # config.active_storage.service = :test
-
-  # Disable ActionMailer unless you're testing email delivery
-  # config.action_mailer.delivery_method = :test
-  # config.action_mailer.default_url_options = { host: "example.com" }
 
   config.active_support.deprecation = :stderr
 
