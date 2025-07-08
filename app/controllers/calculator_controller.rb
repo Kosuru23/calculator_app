@@ -483,9 +483,9 @@ class CalculatorController < ApplicationController
 
   #Quadratic Equations
   def values
-    a = params[:a].to_f
-    b = params[:b].to_f
-    c = params[:c].to_f
+    a = parse_number(params[:a])
+    b = parse_number(params[:b])
+    c = parse_number(params[:c])
 
     if a == 0
       @solution = "a = 0 is invalid"
@@ -495,16 +495,16 @@ class CalculatorController < ApplicationController
     discriminant = b**2 - 4 * a * c
 
     if discriminant > 0
-      root1 = (-b + Math.sqrt(discriminant)) / (2 * a)
-      root2 = (-b - Math.sqrt(discriminant)) / (2 * a)
-      @solution = "x₁ = #{root1.round(4)}, x₂ = #{root2.round(4)}"
+      root1 = (-b + Math.sqrt(discriminant.to_f)) / (2 * a)
+      root2 = (-b - Math.sqrt(discriminant.to_f)) / (2 * a)
+      @solution = "x₁ = #{format_number(root1)}, x₂ = #{format_number(root2)}"
     elsif discriminant == 0
       root = -b / (2 * a)
-      @solution = "x = #{root.round(4)} (double root)"
+      @solution = "x = #{format_number(root)} (double root)"
     else
-      real = (-b / (2 * a)).round(4)
-      imag = (Math.sqrt(-discriminant) / (2 * a)).round(4)
-      @solution = "x₁ = #{real} + #{imag}i, x₂ = #{real} - #{imag}i"
+      real = -b / (2 * a)
+      imag = Math.sqrt(-discriminant.to_f) / (2 * a)
+      @solution = "x₁ = #{format_number(real)} + #{format_number(imag)}i, x₂ = #{format_number(real)} - #{format_number(imag)}i"
     end
   end
 
@@ -522,6 +522,11 @@ class CalculatorController < ApplicationController
     end
     rescue
       raise "Invalid number format: #{str}"
+  end
+  
+  def format_number(num)
+    num = num.to_f
+    num.abs > 1_000_000 ? "∞" : num.round(4)
   end
 
 end
