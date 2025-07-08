@@ -7,7 +7,12 @@ class CalculatorController < ApplicationController
 
   def index
     if request.post?
-      expression = params[:expression]
+      expression = params[:expression].to_s.strip
+
+      if expression.empty?
+        @result = "Please input a number"
+        return
+      end
 
       if expression.gsub(/[0-9+\/*%().\s^,\-a-zA-Z√]/, '').empty?
         begin
@@ -417,6 +422,12 @@ class CalculatorController < ApplicationController
   # Linear Equations
   def solve_2x2
     begin
+      required = [:a1, :b1, :c1, :a2, :b2, :c2]
+        if required.any? { |key| params[key].to_s.strip.empty? }
+          @error = "Please input all coefficients for both equations."
+          return
+        end
+
       a1 = parse_number(params[:a1])
       b1 = parse_number(params[:b1])
       c1 = parse_number(params[:c1])
@@ -437,6 +448,10 @@ class CalculatorController < ApplicationController
 
   def solve_single_variable(equation)
     begin
+      if equation.to_s.strip.empty?
+        @error = "Please input an equation."
+        return
+      end
       # Normalize unicode dashes to ASCII minus
       equation = equation.gsub(/[–—−]/, '-')
 
@@ -483,6 +498,15 @@ class CalculatorController < ApplicationController
 
   #Quadratic Equations
   def values
+    a_str = params[:a].to_s.strip
+    b_str = params[:b].to_s.strip
+    c_str = params[:c].to_s.strip
+
+    if a_str.empty? || b_str.empty? || c_str.empty?
+      @solution = "Please input a number for all fields (a, b, and c)."
+      return
+    end
+    
     a = parse_number(params[:a])
     b = parse_number(params[:b])
     c = parse_number(params[:c])

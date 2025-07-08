@@ -54,23 +54,31 @@
     const input = document.getElementById("expression");
     const form = document.getElementById("calc-form");
 
-    function handleClick(value) {
-      if (value === "=") {
-        form.submit();
-      } else if (value === "C") {
-        input.value = "";
-      } else {
-        input.value += value;
-        input.focus();
+  function handleClick(value) {
+    if (value === "=") {
+      if (input.value.trim() === "") {
+        alert("Please input a number");
+        return;
       }
+      form.submit();
+    } else if (value === "C") {
+      input.value = "";
+    } else {
+      input.value += value;
+      input.focus();
     }
+  }
 
-    input.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        form.submit();
+  input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (input.value.trim() === "") {
+        alert("Please input a number");
+        return;
       }
-    });
+      form.submit();
+    }
+  });
 
     // Expose handleClick to global scope
     window.handleClick = handleClick;
