@@ -7,7 +7,7 @@ class CalculatorController < ApplicationController
     if request.post?
       expression = params[:expression]
 
-      if expression.gsub(/[0-9+\/*%().\s^,-]/, '').empty?
+      if expression.gsub(/[0-9+\/*%().\s^,\-a-zA-Z√]/, '').empty?
         begin
           safe_expr = preprocess_expression(expression)
           @result = eval(safe_expr)
@@ -163,9 +163,35 @@ class CalculatorController < ApplicationController
 
   def preprocess_expression(expr)
     expr = expr.gsub('^', '**')
+
+    expr = expr.gsub('√', 'sqrt')
+    # Percentage handling
     expr = expr.gsub(/%(\s*\d)/, '% of\1')
     expr = expr.gsub(/(\d+(\.\d+)?)\s*%\s*of\s*(\d+(\.\d+)?)/i) { "(#{$1} / 100.0) * #{$3}" }
     expr = expr.gsub(/(\d+(\.\d+)?)\s*%/) { "(#{$1} / 100.0)" }
+
+    # Superscript numbers like ² to normal powers
+    expr = expr.gsub(/([\d\)])([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/) do
+      base = $1
+      power = $2.chars.map { |c| "⁰¹²³⁴⁵⁶⁷⁸⁹".index(c) }.join
+      "#{base}**#{power}"
+    end
+
+    # Math function mapping
+    expr = expr.gsub(/\b(sin|cos|tan|asin|acos|atan|sqrt|log|ln)\b/i) do |fn|
+      case fn.downcase
+      when 'ln' then 'Math.log'
+      when 'log' then 'Math.log10'
+      when 'sqrt' then 'Math.sqrt'
+      else "Math.#{fn.downcase}"
+      end
+    end
+
+    # Convert sin(x) → sin(x * Math::PI / 180) for degree support
+    expr = expr.gsub(/Math\.(sin|cos|tan)\(([^()]+)\)/i) do
+      "Math.#{$1}(#{$2} * Math::PI / 180)"
+    end
+
     expr
   end
 
