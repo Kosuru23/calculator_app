@@ -16,6 +16,14 @@ class CalculatorController < ApplicationController
 
       if expression.gsub(/[0-9+\/*%().\s^,\-a-zA-Z√]/, '').empty?
         begin
+          # ✅ Check for unmatched parentheses here
+          open_parens = expression.count('(')
+          close_parens = expression.count(')')
+          if open_parens != close_parens
+            @result = "Error: Missing parenthesis"
+            return
+          end
+
           safe_expr = preprocess_expression(expression)
           @result = eval(safe_expr)
 
