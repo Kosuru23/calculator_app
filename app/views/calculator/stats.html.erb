@@ -1,3 +1,5 @@
+<%= stylesheet_link_tag 'stats', media: 'all' %>
+
 <h1>Statistics Calculator</h1>
 
 <%= form_with url: stats_path, method: :post, local: true, data: { turbo: false } do %>
@@ -14,29 +16,25 @@
 <% end %>
 
 <% if @mean %>
-  <h2>Results:</h2>
-  <p><strong>Minimum:</strong> <%= @min %></p>
-  <p><strong>Maximum:</strong> <%= @max %></p>
-  <p><strong>Mean (Unweighted):</strong> <%= @mean.round(4) %></p>
-
+  <h2> Mean (Unweighted) = <%= @mean.round(4) %></h2>
   <% if @weighted_mean %>
-    <p><strong>Weighted Mean:</strong> <%= @weighted_mean.round(4) %></p>
+    <h2> Weighted Mean = <%= @weighted_mean.round(4) %></h2>
   <% end %>
-
-  <p><strong>Median:</strong> <%= @median %></p>
-  <p><strong>Mode:</strong> <%= @mode ? @mode.join(', ') : 'No mode' %></p>
+  <h2> Minimum = <%= @min %></h2>
+  <h2> Maximum = <%= @max %></h2>
+  <h2> Median = <%= @median %></h2>
+  <h2> Mode = <%= @mode ? @mode.join(', ') : 'No mode' %></h2>
   <hr>
-  <p><strong>Population Variance:</strong> <%= @pop_variance.round(4) %></p>
-  <p><strong>Population Standard Deviation:</strong> <%= @pop_std_dev.round(4) %></p>
-  <p><strong>Sample Variance:</strong> <%= @sample_variance.round(4) %></p>
-  <p><strong>Sample Standard Deviation:</strong> <%= @sample_std_dev.round(4) %></p>
+  <h2> Population Variance = <%= @pop_variance.round(4) %></h2>
+  <h2> Population Standard Deviation = <%= @pop_std_dev.round(4) %></h2>
+  <h2> Sample Variance = <%= @sample_variance.round(4) %></h2>
+  <h2> Sample Standard Deviation = <%= @sample_std_dev.round(4) %></h2>
   <hr>
-  <p><strong>MAD (Mean Absolute Deviation):</strong> <%= @mad.round(4) %></p>
-  <p><strong>RMS (Root Mean Square):</strong> <%= @rms.round(4) %></p>
-  <p><strong>IQR (Interquartile Range):</strong> <%= @iqr.round(4) %></p>
+  <h2> MAD (Mean Absolute Deviation) = <%= @mad.round(4) %></h2>
+  <h2> RMS (Root Mean Square) = <%= @rms.round(4) %></h2>
+  <h2> IQR (Interquartile Range) = <%= @iqr.round(4) %></h2>
 <% elsif @error %>
   <p style="color: red;"><%= @error %></p>
 <% end %>
 
-<div> <%= link_to "Calculator", root_path, data: { turbo: false } %> </div>
-<div> <%= link_to "Polynomials Page", polynomial_path, data: { turbo: false } %> </div>
+

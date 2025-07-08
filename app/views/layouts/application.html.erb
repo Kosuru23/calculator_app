@@ -23,6 +23,21 @@
   </head>
 
   <body>
-    <%= yield %>
+    <div id="sidebar">
+      <h2>Omni-Calculator</h2>
+      <nav>
+        <ul>
+          <li class="<%= 'active' if current_page?(root_path) %>"><%= link_to 'Calculator', root_path, data: { turbo: false } %></li>
+          <li class="<%= 'active' if current_page?(polynomial_path) %>"><%= link_to 'Polynomials', polynomial_path, data: { turbo: false } %></li>
+          <li class="<%= 'active' if current_page?(stats_path) %>"><%= link_to 'Statistics', stats_path, data: { turbo: false } %></li>
+          <li class="<%= 'active' if current_page?(linear_path) %>"><%= link_to 'Linear Equations', linear_path, data: { turbo: false } %></li>
+          <li class="<%= 'active' if current_page?(quadratic_path) %>"><%= link_to 'Quadratic Equations', quadratic_path, data: { turbo: false } %></li>
+        </ul>
+      </nav>
+    </div>
+    <div id="main-content">
+      <%= yield %>
+    </div>
+    <%= stylesheet_link_tag 'sidebar', media: 'all' %>
   </body>
 </html>

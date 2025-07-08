@@ -1,19 +1,23 @@
+<%= stylesheet_link_tag 'quadratic', media: 'all' %>
+
 <h1>Quadratic Equation Solver</h1>
 
-<%= form_with url: quadratic_path, method: :post, local: true, data: { turbo: false } do %>
+<%= form_with url: quadratic_path, method: :post, local: true, data: { turbo: false }, html: { class: 'quadratic-form' } do %>
   <h3>Enter values for a, b, and c (a ≠ 0):</h3>
-  <%= text_field_tag :a, params[:a], placeholder: "a (e.g. 1/2 or 0.5)" %>
-  <%= text_field_tag :b, params[:b], placeholder: "b (e.g. -4 or -1/3)" %>
-  <%= text_field_tag :c, params[:c], placeholder: "c (e.g. 2 or 5/8)" %><br><br>
-
-  <%= submit_tag "Solve" %>
+  <div class="quadratic-row">
+    <%= text_field_tag :a, params[:a], placeholder: "a", class: 'quadratic-input' %>
+    <span>(x²)</span>
+    <%= text_field_tag :b, params[:b], placeholder: "b", class: 'quadratic-input' %>
+    <span>(x)</span>
+    <%= text_field_tag :c, params[:c], placeholder: "c", class: 'quadratic-input' %>
+    <span>(constant)</span>
+  </div>
+  <div class="quadratic-btn-row">
+    <%= submit_tag "Solve" %>
+  </div>
 <% end %>
 
 <% if @solution %>
-  <h3>🧮 Solution to the quadratic formula:</h3>
-  <p><%= @solution %></p>
-<% end %> <br>
+  <h2>Result: <%= @solution %></h2>
+<% end %>
 
-<%= link_to "Polynomials Page", polynomial_path, data: { turbo: false } %> <br>
-<%= link_to "Statistic Page", stats_path, data: { turbo: false } %> <br>
-<%= link_to "Linear Equation Page", linear_path, data: { turbo: false } %> <br>

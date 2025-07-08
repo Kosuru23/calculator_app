@@ -116,11 +116,6 @@ class CalculatorController < ApplicationController
   def polynomial
     expr = params[:expression].to_s.strip
 
-    if expr.empty?
-      @message = "Please enter an expression."
-      return
-    end
-
     begin
       expr.gsub!(/\)\s*\(/, ')*(')
       if expr.match(/\((\d*)[a-z]\s*[+-]\s*\d+\)\s*\^\d+/i)

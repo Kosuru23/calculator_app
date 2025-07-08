@@ -1,0 +1,63 @@
+body {
+  background: #fff5f5;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+h2 {
+  color: #b30000;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.polynomial-form {
+  background: #fff;
+  border: 2px solid #b30000;
+  border-radius: 10px;
+  padding: 24px 32px;
+  max-width: 500px;
+  margin: 30px auto 20px auto;
+  box-shadow: 0 2px 12px #b3000033;
+}
+
+.polynomial-form input[type="text"] {
+  border: 2px solid #b30000;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1.1rem;
+  color: #b30000;
+  margin-bottom: 10px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.polynomial-form input[type="submit"] {
+  background: #b30000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  padding: 10px 24px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.polynomial-form input[type="submit"]:hover {
+  background: #e60026;
+  transform: scale(1.05);
+}
+
+p, label, strong {
+  color: #b30000;
+}
+
+a {
+  color: #b30000;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #e60026;
+} 

@@ -1,29 +1,30 @@
+<%= stylesheet_link_tag 'calculator', media: 'all' %>
+
 <h1>Calculator</h1>
 
 <%= form_with url: root_path, method: :post, local: true, data: { turbo: false }, id: "calc-form" do %>
   <%= text_field_tag :expression, params[:expression], id: "expression", size: 30, autocomplete: "off" %><br><br>
 
-<div id="calculator-buttons" style="display: grid; grid-template-columns: repeat(4, 60px); gap: 10px;">
+  <div id="calculator-buttons" style="display: grid; grid-template-columns: repeat(5, 60px); gap: 10px;">
     <button type="button" onclick="handleClick('7')">7</button>
     <button type="button" onclick="handleClick('8')">8</button>
     <button type="button" onclick="handleClick('9')">9</button>
     <button type="button" onclick="handleClick('+')">+</button>
+    <button type="button" onclick="handleClick('-')">-</button>
 
     <button type="button" onclick="handleClick('4')">4</button>
     <button type="button" onclick="handleClick('5')">5</button>
     <button type="button" onclick="handleClick('6')">6</button>
-    <button type="button" onclick="handleClick('-')">-</button>
+    <button type="button" onclick="handleClick('*')">*</button>
+    <button type="button" onclick="handleClick('/')">/</button>
 
     <button type="button" onclick="handleClick('1')">1</button>
     <button type="button" onclick="handleClick('2')">2</button>
     <button type="button" onclick="handleClick('3')">3</button>
-    <button type="button" onclick="handleClick('*')">*</button>
-
     <button type="button" onclick="handleClick('0')">0</button>
     <button type="button" onclick="handleClick('.')">.</button>
-    <button type="button" onclick="handleClick('(')">(</button>
-    <button type="button" onclick="handleClick('/')">/</button>
 
+    <button type="button" onclick="handleClick('(')">(</button>
     <button type="button" onclick="handleClick(')')">)</button>
     <button type="button" onclick="handleClick('^')">^</button>
     <button type="button" onclick="handleClick('%')">%</button>
@@ -34,8 +35,8 @@
     <button type="button" onclick="handleClick('tan(')">tan</button>
     <button type="button" onclick="handleClick('√(')">√</button>
     <button type="button" onclick="handleClick('log(')">log</button>
-    <button type="button" onclick="handleClick('ln(')">ln</button>
 
+    <button type="button" onclick="handleClick('ln(')">ln</button>
     <button type="button" onclick="handleClick('=')">=</button>
   </div>
 <% end %>
@@ -44,41 +45,30 @@
   <h2>Result: <%= @result %></h2>
 <% end %> <br>
 
-<%= link_to "Polynomials Page", polynomial_path, data: { turbo: false } %> <br>
-<%= link_to "Statistic Page", stats_path, data: { turbo: false } %> <br>
-<%= link_to "Linear Equation Page", linear_path, data: { turbo: false } %> <br>
-<%= link_to "Quadratic Equation Page", quadratic_path, data: { turbo: false } %> <br>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const input = document.getElementById("expression");
     const form = document.getElementById("calc-form");
 
-  function handleClick(value) {
-    if (value === "=") {
-      if (input.value.trim() === "") {
-        alert("Please input a number");
-        return;
+    function handleClick(value) {
+      if (value === "=") {
+        form.submit();
+      } else if (value === "C") {
+        input.value = "";
+      } else {
+        input.value += value;
+        input.focus();
       }
-      form.submit();
-    } else if (value === "C") {
-      input.value = "";
-    } else {
-      input.value += value;
-      input.focus();
     }
-  }
 
-  input.addEventListener("keydown", function(e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (input.value.trim() === "") {
-        alert("Please input a number");
-        return;
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        form.submit();
       }
-      form.submit();
-    }
-  });
+    });
 
     // Expose handleClick to global scope
     window.handleClick = handleClick;
