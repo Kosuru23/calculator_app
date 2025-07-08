@@ -1,6 +1,7 @@
 require 'bigdecimal'
 require 'bigdecimal/util'
 require 'matrix'
+require 'rational'
 
 class CalculatorController < ApplicationController
 
@@ -171,6 +172,20 @@ class CalculatorController < ApplicationController
     expr = expr.gsub('^', '**')
 
     expr = expr.gsub('√', 'sqrt')
+
+    # Implicit multiplication handling
+    # number followed by parenthesis → 8(3) → 8*(3)
+    expr = expr.gsub(/(\d)\s*\(/, '\1*(')
+
+    # closing parenthesis followed by number → (3)8 → (3)*8
+    expr = expr.gsub(/\)\s*(\d)/, ')*\1')
+
+    # parenthesis followed by parenthesis → (2)(3) → (2)*(3)
+    expr = expr.gsub(/\)\s*\(/, ')*(')
+
+    # variable or function followed by parenthesis (e.g., 2sin(30) → 2*sin(30))
+    expr = expr.gsub(/(\d)(Math\.[a-z]+)/, '\1*\2')
+
     # Percentage handling
     expr = expr.gsub(/%(\s*\d)/, '% of\1')
     expr = expr.gsub(/(\d+(\.\d+)?)\s*%\s*of\s*(\d+(\.\d+)?)/i) { "(#{$1} / 100.0) * #{$3}" }
@@ -243,21 +258,22 @@ class CalculatorController < ApplicationController
 
   def simplify_polynomial(expr)
     expr = expr.gsub(' ', '').gsub(/[()]/, '')
-    terms = expr.scan(/[+-]?\d*[a-z](?:\^\d+)?(?:[a-z](?:\^\d+)?)*|[+-]?\d+/i)
+    terms = expr.scan(/[+-]?[\d\.\/]*[a-z](?:\^\d+)?(?:[a-z](?:\^\d+)?)*|[+-]?[\d\.\/]+/i)
     hash = Hash.new(0)
 
     terms.each do |term|
       if term.match(/[a-z]/i)
-        coeff = term[/^[+-]?\d*/]
-        coeff = '+1' if coeff == '+' || coeff.empty?
+        coeff = term[/^[+-]?[\d\.\/]+/] || term[/^[+-]/] || '1'
+        coeff = '+1' if coeff == '+'
         coeff = '-1' if coeff == '-'
-        coeff = coeff.to_i
-        vars = term.sub(/^[+-]?\d*/, '')
+        coeff = parse_number(coeff)
+
+        vars = term.sub(/^[+-]?[\d\.\/]+/, '')
         sorted_vars = vars.scan(/[a-z](?:\^\d+)?/i).sort
         var_key = sorted_vars.join
         hash[var_key] += coeff
       else
-        hash[""] += term.to_i
+        hash[""] += parse_number(term)
       end
     end
 
@@ -268,15 +284,25 @@ class CalculatorController < ApplicationController
     end.map do |vars, coeff|
       next if coeff == 0
       display = vars.empty? ? '' : vars
-      coeff == 1 && !display.empty? ? display :
-      coeff == -1 && !display.empty? ? "-#{display}" :
-      "#{coeff}#{display}"
+
+      formatted_coeff =
+        if coeff.is_a?(Rational) && coeff.denominator != 1
+          "(#{coeff})"
+        elsif coeff == 1 && !display.empty?
+          ''
+        elsif coeff == -1 && !display.empty?
+          "-"
+        else
+          coeff.to_s
+        end
+
+      "#{formatted_coeff}#{display}"
     end.compact.join(' + ').gsub(/\+\s+-/, '- ')
   end
 
   def parse_polynomial(expr)
     expr = expr.gsub(' ', '')
-    terms = expr.scan(/[+-]?\d*[a-z](?:\^\d+)?(?:[a-z](?:\^\d+)?)*|[+-]?\d+/i)
+    terms = expr.scan(/[+-]?[\d\.\/]*[a-z](?:\^\d+)?(?:[a-z](?:\^\d+)?)*|[+-]?[\d\.\/]+/i)
 
     hash = Hash.new(0)
 
@@ -284,17 +310,10 @@ class CalculatorController < ApplicationController
       next if term.strip.empty?
 
       if term.match(/[a-z]/)
-        coeff_str = term[/^[+-]?\d*/]
-        coeff =
-          if coeff_str.nil? || coeff_str.empty?
-            1
-          elsif coeff_str == '+' then 1
-          elsif coeff_str == '-' then -1
-          else coeff_str.to_i
-        end
+        coeff_str = term[/^[+-]?[\d\.\/]+/] || term[/^[+-]/] || '1'
+        coeff = parse_number(coeff_str)
 
-
-        var_part = term.gsub(/^[+-]?\d*/, '')
+        var_part = term.gsub(/^[+-]?[\d\.\/]+/, '')
         var_map = Hash.new(0)
 
         var_part.scan(/[a-z](?:\^\d+)?/i).each do |v|
@@ -306,7 +325,7 @@ class CalculatorController < ApplicationController
         key = var_map.sort.to_h
         hash[key] += coeff
       else
-        hash[{}] += term.to_i
+        hash[{}] += parse_number(term)
       end
     end
 
@@ -318,9 +337,9 @@ class CalculatorController < ApplicationController
 
     sorted = hash.sort_by do |vars, _|
       [
-        -vars.values.sum,                      
-        vars.keys.join,                        
-        vars.map { |_, exp| -exp }             
+        -vars.values.sum,
+        vars.keys.join,
+        vars.map { |_, exp| -exp }
       ]
     end
 
@@ -329,13 +348,18 @@ class CalculatorController < ApplicationController
 
       var_str = vars.map { |v, e| e == 1 ? v : "#{v}^#{e}" }.join
 
-      if coeff == 1 && !var_str.empty?
-        var_str
-      elsif coeff == -1 && !var_str.empty?
-        "-#{var_str}"
-      else
-        "#{coeff}#{var_str}"
-      end
+      formatted_coeff =
+        if coeff.is_a?(Rational) && coeff.denominator != 1
+          "(#{coeff})"
+        elsif coeff == 1 && !var_str.empty?
+          ""
+        elsif coeff == -1 && !var_str.empty?
+          "-"
+        else
+          coeff.to_s
+        end
+
+      "#{formatted_coeff}#{var_str}"
     end.compact.join(' + ').gsub(/\+\s+-/, '- ')
   end
 
@@ -393,19 +417,19 @@ class CalculatorController < ApplicationController
   # Linear Equations
   def solve_2x2
     begin
-      a1 = params[:a1].to_f
-      b1 = params[:b1].to_f
-      c1 = params[:c1].to_f
-      a2 = params[:a2].to_f
-      b2 = params[:b2].to_f
-      c2 = params[:c2].to_f
+      a1 = parse_number(params[:a1])
+      b1 = parse_number(params[:b1])
+      c1 = parse_number(params[:c1])
+      a2 = parse_number(params[:a2])
+      b2 = parse_number(params[:b2])
+      c2 = parse_number(params[:c2])
 
       a = Matrix[[a1, b1], [a2, b2]]
       b = Matrix[[c1], [c2]]
 
       result = a.inverse * b
-      @x = result[0, 0]
-      @y = result[1, 0]
+      @x = result[0, 0].to_f.round(4)
+      @y = result[1, 0].to_f.round(4)
     rescue => e
       @error = "2x2 Solver Error: #{e.message}"
     end
@@ -419,10 +443,10 @@ class CalculatorController < ApplicationController
       # Replace 'y' with 'x'
       expr = equation.gsub('y', 'x')
 
-      # Insert * between number and variable (e.g. 2x → 2*x)
+      # Insert * between digits and variables (e.g., 2x → 2*x)
       expr = expr.gsub(/(\d)([a-zA-Z])/, '\1*\2')
 
-      # Insert * between variable and variable (e.g. xz → x*z) — optional
+      # Insert * between variable and variable (e.g., xy → x*y)
       expr = expr.gsub(/([a-zA-Z])([a-zA-Z])/, '\1*\2')
 
       # Insert * between number/variable and open parenthesis
@@ -431,15 +455,20 @@ class CalculatorController < ApplicationController
       # Insert * between closing parenthesis and variable/number
       expr = expr.gsub(/\)(\d|\w)/, ')*\1')
 
+      # Convert fractions like 1/2 to (1.0/2) to allow float division
+      expr = expr.gsub(/(?<!\()(\b\d+)\s*\/\s*(\d+\b)(?![\d\/]*\))/, '(\1.0/\2)')
+
+      # Split and validate
       left, right = expr.split('=')
-      raise 'Invalid equation' unless left && right
+      raise 'Invalid equation format' unless left && right
 
       solution = nil
       (-1000..1000).step(0.01).each do |x|
+        x = x.to_r
         lhs = eval(left)
         rhs = eval(right)
         if (lhs - rhs).abs < 0.0001
-          solution = x.round(4)
+          solution = x.to_f.round(4)
           break
         end
       end
@@ -477,6 +506,22 @@ class CalculatorController < ApplicationController
       imag = (Math.sqrt(-discriminant) / (2 * a)).round(4)
       @solution = "x₁ = #{real} + #{imag}i, x₂ = #{real} - #{imag}i"
     end
+  end
+
+  #Determines if the input is float/fractional or a integer
+  def parse_number(str)
+    str = str.to_s.strip
+
+    # Remove wrapping parentheses like (1/2) or (3.5)
+    str = str[1..-2].strip if str.start_with?('(') && str.end_with?(')')
+
+    if str.include?('/')
+      Rational(str)
+    else
+      BigDecimal(str)
+    end
+    rescue
+      raise "Invalid number format: #{str}"
   end
 
 end

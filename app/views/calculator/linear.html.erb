@@ -4,19 +4,20 @@
 
 <%= form_with url: linear_path, method: :post, local: true, data: { turbo: false } do %>
   <h3>Equation 1: a₁x + b₁y = c₁</h3>
-  <%= number_field_tag :a1, params[:a1], placeholder: "a₁" %>
-  <%= number_field_tag :b1, params[:b1], placeholder: "b₁" %>
+  <%= text_field_tag :a1, params[:a1], placeholder: "a₁" %>
+  <%= text_field_tag :b1, params[:b1], placeholder: "b₁" %>
   =
-  <%= number_field_tag :c1, params[:c1], placeholder: "c₁" %><br><br>
+  <%= text_field_tag :c1, params[:c1], placeholder: "c₁" %><br><br>
 
   <h3>Equation 2: a₂x + b₂y = c₂</h3>
-  <%= number_field_tag :a2, params[:a2], placeholder: "a₂" %>
-  <%= number_field_tag :b2, params[:b2], placeholder: "b₂" %>
+  <%= text_field_tag :a2, params[:a2], placeholder: "a₂" %>
+  <%= text_field_tag :b2, params[:b2], placeholder: "b₂" %>
   =
-  <%= number_field_tag :c2, params[:c2], placeholder: "c₂" %><br><br>
+  <%= text_field_tag :c2, params[:c2], placeholder: "c₂" %><br><br>
 
   <%= submit_tag "Solve 2x2" %>
 <% end %>
+
 
 <% if @x && @y %>
   <h3>🧮 Solution for 2x2:</h3>
