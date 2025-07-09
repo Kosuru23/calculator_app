@@ -16,5 +16,11 @@ test:
   database: calculator_app_test
 
 production:
-  <<: *default
-  url: <%= ENV["DATABASE_URL"] %>
+  primary:
+    url: <%= ENV["DATABASE_URL"] %>
+    pool: 5
+
+  cable:
+    url: <%= ENV["DATABASE_URL"] %>
+    pool: 5
+

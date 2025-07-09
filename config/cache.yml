@@ -12,5 +12,6 @@ test:
   <<: *default
 
 production:
-  database: cache
-  <<: *default
+  adapter: postgresql
+  url: <%= ENV["DATABASE_URL"] %>
+
