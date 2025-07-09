@@ -81,20 +81,5 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary: &primary_production
-    <<: *default
-    database: calculator_app_production
-    username: calculator_app
-    password: <%= ENV["CALCULATOR_APP_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: calculator_app_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: calculator_app_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: calculator_app_production_cable
-    migrations_paths: db/cable_migrate
+  url: <%= ENV["DATABASE_URL"] %>
+  pool: 5
